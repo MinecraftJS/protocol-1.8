@@ -1,3 +1,3 @@
-# MinecraftJS Template
+# Minecraft 1.8 Protocol
 
-Fill with your own content
+Minecraft 1.8 protocol (47)

@@ -1,7 +1,7 @@
 {
-  "name": "template",
+  "name": "@minecraft-js/protocol-1.8",
   "version": "1.0.0",
-  "description": "todo: change",
+  "description": "Minecraft 1.8 protocol (47)",
   "main": "dist/index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
@@ -9,7 +9,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/MinecraftJS/template.git"
+    "url": "git+https://github.com/MinecraftJS/protocol-1.8.git"
   },
   "keywords": [
     "minecraftjs"
@@ -17,11 +17,14 @@
   "author": "todo: change",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/MinecraftJS/template/issues"
+    "url": "https://github.com/MinecraftJS/protocol-1.8/issues"
   },
-  "homepage": "https://github.com/MinecraftJS/template#readme",
-  "dependencies": {},
+  "homepage": "https://github.com/MinecraftJS/protocol-1.8#readme",
+  "dependencies": {
+    "@minecraft-js/bufwrapper": "^1.4.4"
+  },
   "devDependencies": {
+    "@types/node": "^18.7.13",
     "prettier": "^2.7.1",
     "typescript": "^4.7.4"
   },
