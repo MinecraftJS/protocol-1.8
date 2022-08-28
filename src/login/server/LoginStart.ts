@@ -9,6 +9,8 @@ export class LoginStartPacket extends Packet<LoginStart> {
     this.data = data || this.data;
 
     this.buf.writeString(this.data.name);
+
+    this.buf.finish();
   }
 
   public read(): LoginStart {

@@ -9,6 +9,8 @@ export class SetCompressionPacket extends Packet<SetCompression> {
     this.data = data || this.data;
 
     this.buf.writeVarInt(this.data.threshold);
+
+    this.buf.finish();
   }
 
   public read(): SetCompression {

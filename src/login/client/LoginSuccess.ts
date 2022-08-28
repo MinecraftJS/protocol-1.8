@@ -1,3 +1,4 @@
+import { parseUUID, UUID } from '@minecraft-js/uuid';
 import { Packet } from '../../Packet';
 import { State } from '../../State';
 
@@ -8,13 +9,15 @@ export class LoginSuccessPacket extends Packet<LoginSuccess> {
   public write(data?: LoginSuccess): void {
     this.data = data || this.data;
 
-    this.buf.writeString(this.data.UUID);
+    this.buf.writeString(this.data.UUID.toString());
     this.buf.writeString(this.data.username);
+
+    this.buf.finish();
   }
 
   public read(): LoginSuccess {
     this.data = {
-      UUID: this.buf.readString(),
+      UUID: parseUUID(this.buf.readString()),
       username: this.buf.readString(),
     };
 
@@ -26,6 +29,6 @@ export class LoginSuccessPacket extends Packet<LoginSuccess> {
  * @see https://wiki.vg/index.php?title=Protocol&oldid=7368#Login_Success
  */
 interface LoginSuccess {
-  UUID: string;
+  UUID: UUID;
   username: string;
 }

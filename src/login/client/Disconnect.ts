@@ -10,6 +10,8 @@ export class DisconnectPacket extends Packet<Disconnect> {
 
     // TODO: Parse `Chat` field type
     this.buf.writeBytes(Buffer.alloc(1));
+
+    this.buf.finish();
   }
 
   public read(): Disconnect {

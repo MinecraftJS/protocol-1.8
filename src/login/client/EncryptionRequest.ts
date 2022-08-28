@@ -15,6 +15,8 @@ export class EncryptionRequestPacket extends Packet<EncryptionRequest> {
 
     this.buf.writeVarInt(this.data.verifyToken.length);
     this.buf.writeBytes(this.data.verifyToken);
+
+    this.buf.finish();
   }
 
   public read(): EncryptionRequest {

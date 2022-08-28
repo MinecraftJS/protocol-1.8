@@ -13,6 +13,8 @@ export class EncryptionResponsePacket extends Packet<EncryptionResponse> {
 
     this.buf.writeVarInt(this.data.verifyToken.length);
     this.buf.writeBytes(this.data.verifyToken);
+
+    this.buf.finish();
   }
 
   public read(): EncryptionResponse {
