@@ -1,5 +1,9 @@
 # Minecraft 1.8 Protocol
 
+![GitHub Workflow Status](https://img.shields.io/github/workflow/status/MinecraftJS/protocol-1.8/Build?style=for-the-badge)
+![GitHub](https://img.shields.io/github/license/MinecraftJS/protocol-1.8?style=for-the-badge)
+![npm (scoped)](https://img.shields.io/npm/v/@minecraft-js/protocol-1.8?style=for-the-badge)
+
 Minecraft 1.8 protocol (47)
 
 # Benchmarks
