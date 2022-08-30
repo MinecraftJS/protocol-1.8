@@ -1,5 +1,5 @@
+import { State } from '../../constants';
 import { Packet } from '../../Packet';
-import { State } from '../../State';
 
 export class SetCompressionPacket extends Packet<SetCompression> {
   public static id = 0x03;

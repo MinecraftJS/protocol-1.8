@@ -1,6 +1,6 @@
 import { parseUUID, UUID } from '@minecraft-js/uuid';
+import { State } from '../../constants';
 import { Packet } from '../../Packet';
-import { State } from '../../State';
 
 export class LoginSuccessPacket extends Packet<LoginSuccess> {
   public static id = 0x02;

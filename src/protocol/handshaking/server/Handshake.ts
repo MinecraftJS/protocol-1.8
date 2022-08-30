@@ -1,5 +1,5 @@
+import { State } from '../../constants';
 import { Packet } from '../../Packet';
-import { State } from '../../State';
 
 export class HandshakePacket extends Packet<Handshake> {
   public static id = 0x00;
@@ -17,6 +17,8 @@ export class HandshakePacket extends Packet<Handshake> {
     this.buf.writeBytes(serverPortBuf);
 
     this.buf.writeVarInt(this.data.nextState);
+
+    this.buf.finish();
   }
 
   public read(): Handshake {

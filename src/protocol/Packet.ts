@@ -1,5 +1,5 @@
 import { BufWrapper } from '@minecraft-js/bufwrapper';
-import { State } from './State';
+import { State } from './constants';
 
 /** Class representing a packet */
 export class Packet<T> {

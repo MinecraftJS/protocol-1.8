@@ -1,5 +1,5 @@
+import { State } from '../../constants';
 import { Packet } from '../../Packet';
-import { State } from '../../State';
 
 export class DisconnectPacket extends Packet<Disconnect> {
   public static id = 0x00;

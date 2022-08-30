@@ -1,5 +1,5 @@
+import { State } from '../../constants';
 import { Packet } from '../../Packet';
-import { State } from '../../State';
 
 export class EncryptionResponsePacket extends Packet<EncryptionResponse> {
   public static id = 0x01;
