@@ -7,16 +7,16 @@ import {
   privateDecrypt,
 } from 'node:crypto';
 import { inflateSync } from 'node:zlib';
-import { ProtocolResolvable } from './protocol';
-import { State } from './protocol/constants';
-import { HandshakePacket } from './protocol/handshaking/server';
+import { ProtocolResolvable } from '..';
+import { State } from './constants';
+import { HandshakePacket } from './handshaking/server';
 import {
   EncryptionRequestPacket,
   LoginSuccessPacket,
   SetCompressionPacket,
-} from './protocol/login/client';
-import { EncryptionResponsePacket } from './protocol/login/server';
-import { Packet } from './protocol/Packet';
+} from './login/client';
+import { EncryptionResponsePacket } from './login/server';
+import { Packet } from './Packet';
 
 export class PacketReader<Protocol extends ProtocolResolvable> {
   /** Whether or not the encryption is enabled */
@@ -31,9 +31,9 @@ export class PacketReader<Protocol extends ProtocolResolvable> {
   public compressionTreshold: number;
   /** State this PacketHandler is currently in */
   public state: State;
-
   /** Protocol object containing all the packets */
-  private protocol: Protocol;
+  public protocol: Protocol;
+
   /** Object containing all the packet listeners */
   private packetListeners: { [key: string]: ((...args: any[]) => any)[] };
   /** Options applied to this instance */
@@ -47,6 +47,21 @@ export class PacketReader<Protocol extends ProtocolResolvable> {
    */
   private queue: Buffer[];
 
+  /**
+   * Create a new `PacketReader`
+   * @param protocol Protocol to bind this `PacketReader` to
+   * @param options Options to pass to the `PacketReader` instance
+   * @example
+   * ```javascript
+   * const packetReader = new PacketReader(packets.serverbound);
+   *
+   * packetReader.onPacket('HandshakePacket', (packet) => {
+   *   console.log('Received Handshake', packet.data);
+   * });
+   *
+   * packetReader.readTCPMessage(getBufferSomehow);
+   * ```
+   */
   public constructor(protocol: Protocol, options?: PacketReaderOptions) {
     this.encryptionEnabled = false;
     this.encryptionKey = null;
@@ -201,7 +216,7 @@ export class PacketReader<Protocol extends ProtocolResolvable> {
   /**
    * Set the compression specifications, whether to enable it or not and its treshold
    * @param enabled Whether or not the compression is enabled
-   * @param treshold If yes, you can provide the compression threshold
+   * @param treshold If yes, you must provide the compression threshold
    */
   public setCompression(enabled: boolean, treshold?: number): void {
     this.compressionEnabled = enabled;
@@ -229,6 +244,22 @@ export class PacketReader<Protocol extends ProtocolResolvable> {
     if (!Array.isArray(this.packetListeners[name as string]))
       return void (this.packetListeners[name as string] = [listener]);
     this.packetListeners[name as string].push(listener);
+  }
+
+  /**
+   * Add a one time event listener, will be triggered when the packet specified is received
+   * @param name Name of the packet to listen to
+   * @param listener Listener function called when the event is triggered
+   */
+  public oncePacket<T extends keyof PacketReaderEvents<Protocol>>(
+    name: T,
+    listener: PacketReaderEvents<Protocol>[T]
+  ): void {
+    const wrappedListener: PacketReaderEvents<Protocol>[T] = (...args) => {
+      listener(...args);
+      this.offPacket(name, wrappedListener);
+    };
+    this.onPacket(name, wrappedListener);
   }
 
   /**
@@ -269,7 +300,8 @@ export class PacketReader<Protocol extends ProtocolResolvable> {
   private processPacketEffect(packet: Packet<unknown>): void {
     // Client to Server
     if (packet instanceof HandshakePacket)
-      return void (this.state = packet.data.nextState);
+      return void (this.state =
+        packet.data.nextState === State.LOGIN ? State.LOGIN : State.STATUS);
 
     if (packet instanceof LoginSuccessPacket)
       return void (this.state = State.PLAY);
@@ -279,14 +311,6 @@ export class PacketReader<Protocol extends ProtocolResolvable> {
         key: this.encryptionKey,
         padding: constants.RSA_PKCS1_PADDING,
       };
-
-      // const verifyToken = privateDecrypt(
-      //   {
-      //     key: this.encryptionKey,
-      //     padding: constants.RSA_PKCS1_PADDING,
-      //   },
-      //   packet.data.sharedSecret
-      // );
 
       const sharedToken = privateDecrypt(key, packet.data.sharedSecret);
       this.setEncryption(true, sharedToken);
@@ -315,6 +339,7 @@ type PacketReaderEvents<Protocol extends ProtocolResolvable> = {
   [key in keyof Protocol]: (packet: InstanceType<Protocol[key]>) => void;
 };
 
+/** Options you can pass into a `PacketReader` */
 export interface PacketReaderOptions {
   /**
    * Some packets have a direct effect on the packet reader,

@@ -1,8 +1,8 @@
 import { BufWrapper } from '@minecraft-js/bufwrapper';
 import { Cipher, createCipheriv } from 'node:crypto';
 import { deflateSync } from 'node:zlib';
-import { ProtocolResolvable } from './protocol';
-import { Packet } from './protocol/Packet';
+import { ProtocolResolvable } from '..';
+import { Packet } from './Packet';
 
 export class PacketWriter<Protocol extends ProtocolResolvable> {
   /** Whether or not the encryption is enabled */
@@ -15,13 +15,12 @@ export class PacketWriter<Protocol extends ProtocolResolvable> {
   public compressionTreshold: number;
 
   public cipher: Cipher;
-
   /** Protocol this `PacketWriter` is bound to */
-  private protocol: Protocol;
+  public protocol: Protocol;
 
   /**
    * Instanciate a new `PacketWriter`. Use this class to write packets
-   * @param protocol Protocol you want to bind this `PacketWriter` to
+   * @param protocol Protocol to bind this `PacketWriter` to
    * @example
    * ```javascript
    * const packetWriter = new PacketWriter(packets.serverbound);
@@ -41,7 +40,7 @@ export class PacketWriter<Protocol extends ProtocolResolvable> {
    * Write a packet
    * @example
    * ```javascript
-   * packetWriter.writeFromClass('HandshakePacket', {
+   * packetWriter.write('HandshakePacket', {
    *   protocolVersion: 47,
    *   serverAddress: 'localhost',
    *   serverPort: 25565,
@@ -154,7 +153,7 @@ export class PacketWriter<Protocol extends ProtocolResolvable> {
   /**
    * Set the compression specifications, whether to enable it or not and its treshold
    * @param enabled Whether or not the compression is enabled
-   * @param treshold If yes, you can provide the compression threshold
+   * @param treshold If yes, you must provide the compression threshold
    */
   public setCompression(enabled: boolean, treshold?: number): void {
     this.compressionEnabled = enabled;
