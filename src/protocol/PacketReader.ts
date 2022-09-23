@@ -1,21 +1,10 @@
 import { BufWrapper } from '@minecraft-js/bufwrapper';
-import {
-  constants,
-  createDecipheriv,
-  Decipher,
-  KeyObject,
-  privateDecrypt,
-} from 'node:crypto';
+import { createDecipheriv, Decipher, KeyObject } from 'node:crypto';
 import { inflateSync } from 'node:zlib';
 import { ProtocolResolvable } from '..';
 import { State } from './constants';
 import { HandshakePacket } from './handshaking/server';
-import {
-  EncryptionRequestPacket,
-  LoginSuccessPacket,
-  SetCompressionPacket,
-} from './login/client';
-import { EncryptionResponsePacket } from './login/server';
+import { LoginSuccessPacket, SetCompressionPacket } from './login/client';
 import { Packet } from './Packet';
 
 export class PacketReader<Protocol extends ProtocolResolvable> {
@@ -182,7 +171,7 @@ export class PacketReader<Protocol extends ProtocolResolvable> {
       this.emitPacket(event, packet);
     } else {
       this.debug(
-        `PacketID=${packetId} State=${this.state} Length=${buffer.length}`
+        `Unknown PacketID=${packetId} State=${this.state} Length=${buffer.length}`
       );
     }
   }
@@ -232,49 +221,67 @@ export class PacketReader<Protocol extends ProtocolResolvable> {
     this.compressionTreshold = treshold;
   }
 
+  public on<T extends keyof PacketReaderSpecialEvents<Protocol>>(
+    event: T,
+    listener: PacketReaderSpecialEvents<Protocol>[T]
+  ): void {
+    if (!Array.isArray(this.packetListeners[`_${event}`]))
+      return void (this.packetListeners[`_${event}`] = [listener]);
+    this.packetListeners[`_${event}`].push(listener);
+  }
+
+  public emit<T extends keyof PacketReaderSpecialEvents<Protocol>>(
+    event: T,
+    ...args: Parameters<PacketReaderSpecialEvents<Protocol>[T]>
+  ): void {
+    const listeners = this.packetListeners[`_${event}`];
+    if (!Array.isArray(listeners)) return;
+    listeners.forEach((listener) => listener(...args));
+  }
+
   /**
    * Add an event listener, will be triggered when the packet specified is received
-   * @param name Name of the packet to listen to
+   * @param event Name of the packet to listen to
    * @param listener Listener function called when the event is triggered
    */
   public onPacket<T extends keyof PacketReaderEvents<Protocol>>(
-    name: T,
+    event: T,
     listener: PacketReaderEvents<Protocol>[T]
   ): void {
-    if (!Array.isArray(this.packetListeners[name as string]))
-      return void (this.packetListeners[name as string] = [listener]);
-    this.packetListeners[name as string].push(listener);
+    if (!Array.isArray(this.packetListeners[event as string]))
+      return void (this.packetListeners[event as string] = [listener]);
+    this.packetListeners[event as string].push(listener);
   }
 
   /**
    * Add a one time event listener, will be triggered when the packet specified is received
-   * @param name Name of the packet to listen to
+   * @param event Name of the packet to listen to
    * @param listener Listener function called when the event is triggered
    */
   public oncePacket<T extends keyof PacketReaderEvents<Protocol>>(
-    name: T,
+    event: T,
     listener: PacketReaderEvents<Protocol>[T]
   ): void {
-    const wrappedListener: PacketReaderEvents<Protocol>[T] = (...args) => {
-      listener(...args);
-      this.offPacket(name, wrappedListener);
+    const wrappedListener: PacketReaderEvents<Protocol>[T] = (packet) => {
+      listener(packet);
+      this.offPacket(event, wrappedListener);
     };
-    this.onPacket(name, wrappedListener);
+    this.onPacket(event, wrappedListener);
   }
 
   /**
    * Remove an event listener
-   * @param name Name of the packet to remove
+   * @param event Name of the packet to remove
    * @param listener Listener function to remove
    * @returns A boolean, true if removed, false otherwise
    */
   public offPacket<T extends keyof PacketReaderEvents<Protocol>>(
-    name: T,
+    event: T,
     listener: PacketReaderEvents<Protocol>[T]
   ): boolean {
-    if (!Array.isArray(this.packetListeners[name as string])) return false;
+    if (!Array.isArray(this.packetListeners[event as string])) return false;
     return (
-      this.packetListeners[name as string].filter((v) => v !== listener)
+      this.packetListeners[event as string].filter((v) => v !== listener)
         .length > 0
     );
   }
@@ -306,21 +313,6 @@ export class PacketReader<Protocol extends ProtocolResolvable> {
     if (packet instanceof LoginSuccessPacket)
       return void (this.state = State.PLAY);
 
-    if (packet instanceof EncryptionResponsePacket) {
-      const key = {
-        key: this.encryptionKey,
-        padding: constants.RSA_PKCS1_PADDING,
-      };
-
-      const sharedToken = privateDecrypt(key, packet.data.sharedSecret);
-      this.setEncryption(true, sharedToken);
-    }
-
-    // Server to Client
-    if (packet instanceof EncryptionRequestPacket) {
-      // Handle encryption request
-    }
-
     if (packet instanceof SetCompressionPacket)
       return this.setCompression(
         packet.data.threshold !== -1,
@@ -334,6 +326,14 @@ export class PacketReader<Protocol extends ProtocolResolvable> {
     console.debug('PacketReader' + tag, ...args);
   }
 }
+
+type PacketReaderSpecialEvents<Protocol extends ProtocolResolvable> = {
+  anyPacket: <T extends keyof Protocol>(
+    name: T,
+    packet: InstanceType<Protocol[T]>
+  ) => void;
+  unknownPacket: (buffer: Buffer) => void;
+};
 
 type PacketReaderEvents<Protocol extends ProtocolResolvable> = {
   [key in keyof Protocol]: (packet: InstanceType<Protocol[key]>) => void;

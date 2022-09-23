@@ -1,3 +1,4 @@
+import * as NodeRSA from 'node-rsa';
 import * as EventEmitter from 'node:events';
 import { Server } from 'node:net';
 import TypedEmitter from 'typed-emitter';
@@ -12,6 +13,8 @@ export class MinecraftServer extends (EventEmitter as new () => TypedEmitter<Min
   /** Array with all the connected players */
   public readonly players: MinecraftServerClient[];
 
+  /** RSA key, used for encryption */
+  private readonly serverKey: NodeRSA;
   /** The actual TCP server */
   private readonly server: Server;
   /** Options passed into this MinecraftServer */
@@ -29,11 +32,17 @@ export class MinecraftServer extends (EventEmitter as new () => TypedEmitter<Min
     this.options = options ?? {};
     this.server = new Server();
 
+    if (this.options.onlineMode) {
+      this.serverKey = new NodeRSA({ b: 1024 });
+    }
+
     this.server.on('connection', (socket) => {
       const client = new MinecraftServerClient(socket, {
         onBeforePong: this.options.onBeforePong,
         onBeforeResponse: this.options.onBeforeResponse,
         compressionTreshold: this.options.compressionTreshold,
+        onlineMode: this.options.onlineMode,
+        serverKey: this.serverKey,
       });
 
       client.on('playing', () => {
@@ -64,11 +73,17 @@ export type MinecraftServerEvents = {
   disconnection: (client: MinecraftServerClient) => void;
 };
 
+/** Options you can pass to a `MinecraftServer` */
 export interface MinecraftServerOptions {
   /** Port to listen to, defaults to `25565` */
   port?: number;
   /** Compression treshold to apply (if not specified or `-1` compression isn't enabled) */
   compressionTreshold?: number;
+  /**
+   * Whether or not you want to enable online mode which
+   * requires a premium Minecraft account to connect
+   */
+  onlineMode?: boolean;
   /**
    * This function is called when the PingPacket is received.
    * If a function is provided it'll take its return value

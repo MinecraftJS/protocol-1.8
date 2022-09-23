@@ -32,15 +32,10 @@ export * from './PacketWriter';
 import { PacketReader } from './PacketReader';
 import { PacketWriter } from './PacketWriter';
 
-export type ClientboundPacketReader = PacketReader<
-  typeof packets['clientbound']
->;
-export type ServerboundPacketReader = PacketReader<
-  typeof packets['serverbound']
->;
-export type ClientboundPacketWriter = PacketWriter<
-  typeof packets['clientbound']
->;
-export type ServerboundPacketWriter = PacketWriter<
-  typeof packets['serverbound']
->;
+export type ClientboundProtocol = typeof packets['clientbound'];
+export type ServerboundProtocol = typeof packets['serverbound'];
+
+export type ClientboundPacketReader = PacketReader<ClientboundProtocol>;
+export type ServerboundPacketReader = PacketReader<ServerboundProtocol>;
+export type ClientboundPacketWriter = PacketWriter<ClientboundProtocol>;
+export type ServerboundPacketWriter = PacketWriter<ServerboundProtocol>;

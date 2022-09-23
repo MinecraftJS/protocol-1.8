@@ -1,6 +1,6 @@
 {
   "name": "@minecraft-js/protocol-1.8",
-  "version": "1.0.0-dev",
+  "version": "1.0.1",
   "description": "Minecraft 1.8 protocol (47)",
   "main": "dist/index.js",
   "scripts": {
@@ -23,10 +23,13 @@
   "homepage": "https://github.com/MinecraftJS/protocol-1.8#readme",
   "dependencies": {
     "@minecraft-js/bufwrapper": "^1.4.6",
-    "@minecraft-js/uuid": "^1.0.3"
+    "@minecraft-js/uuid": "^1.0.3",
+    "@minecraft-js/yggdrasil": "^1.0.0",
+    "node-rsa": "^1.1.1"
   },
   "devDependencies": {
     "@types/node": "^18.7.13",
+    "@types/node-rsa": "^1.1.1",
     "benchmark": "^2.1.4",
     "prettier": "^2.7.1",
     "typed-emitter": "^2.1.0",

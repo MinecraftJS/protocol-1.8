@@ -1,4 +1,7 @@
 import { generateV4, UUID } from '@minecraft-js/uuid';
+import { HasJoinedResponse, yggdrasil } from '@minecraft-js/yggdrasil';
+import * as NodeRSA from 'node-rsa';
+import { constants, privateDecrypt, randomBytes } from 'node:crypto';
 import * as EventEmitter from 'node:events';
 import { Socket } from 'node:net';
 import TypedEmitter from 'typed-emitter';
@@ -24,6 +27,9 @@ export class MinecraftServerClient extends (EventEmitter as new () => TypedEmitt
   public username: string;
   /** Whether or not this client is playing */
   public playing: boolean;
+
+  /** Shared secret used for encryption, only defined if online mode is enabled */
+  private sharedSecret: Buffer;
 
   /** Socket bound to this client */
   private readonly socket: Socket;
@@ -76,14 +82,86 @@ export class MinecraftServerClient extends (EventEmitter as new () => TypedEmitt
   }
 
   /**
+   * Authenticate the player
+   * @returns Information about the player (name, UUID, skin, etc)
+   */
+  private authenticate(): Promise<HasJoinedResponse> {
+    return new Promise((resolve) => {
+      if (!this.options.serverKey) throw new Error('Missing server key');
+
+      const verifyToken = randomBytes(4);
+
+      const publicKeyArray = this.options.serverKey
+        .exportKey('pkcs8-public-pem')
+        .split('\n');
+      publicKeyArray.pop();
+      publicKeyArray.shift();
+      const publicKey = Buffer.from(publicKeyArray.join(''), 'base64');
+
+      const encryptionRequest = this.packetWriter.write(
+        'EncryptionRequestPacket',
+        {
+          serverId: '', // After 1.7.x this field is always an empty string
+          publicKey: publicKey,
+          verifyToken: verifyToken,
+        }
+      );
+
+      this.writeRaw(encryptionRequest);
+
+      const decryptKey = {
+        key: this.options.serverKey.exportKey(),
+        padding: constants.RSA_PKCS1_PADDING,
+      };
+
+      this.packetReader.oncePacket(
+        'EncryptionResponsePacket',
+        async (packet) => {
+          const decryptedVerifyToken = await privateDecrypt(
+            decryptKey,
+            packet.data.verifyToken
+          );
+          if (verifyToken.compare(decryptedVerifyToken) !== 0)
+            throw new Error('Invalid verify token');
+
+          this.sharedSecret = privateDecrypt(
+            decryptKey,
+            packet.data.sharedSecret
+          );
+
+          const hasJoined = await yggdrasil.hasJoined(
+            this.username,
+            '',
+            this.sharedSecret,
+            publicKey
+          );
+
+          this.packetWriter.setEncryption(true, this.sharedSecret);
+          resolve(hasJoined);
+        }
+      );
+    });
+  }
+
+  /**
    * Execute the handshake sequence whether the client wants
    * to play or just ping the server.
    * @param handshake Handshake packet received from the client
    */
   private onHandshake(handshake: HandshakePacket): void {
     // For players connecting to the server
-    this.packetReader.oncePacket('LoginStartPacket', (loginStart) => {
+    this.packetReader.oncePacket('LoginStartPacket', async (loginStart) => {
+      // Only apply for offline players.
+      // If online mode is enabled those fields
+      // are going to be overwritten
       this.username = loginStart.data.name;
+      this.UUID = generateV4();
+
+      if (this.options.onlineMode === true) {
+        const infos = await this.authenticate();
+        this.username = infos.name;
+        this.UUID = infos.id;
+      }
 
       const compressionTreshold = this.options.compressionTreshold;
       if (compressionTreshold && compressionTreshold >= 0) {
@@ -97,10 +175,8 @@ export class MinecraftServerClient extends (EventEmitter as new () => TypedEmitt
         this.packetWriter.setCompression(true, compressionTreshold);
       }
 
-      this.UUID = generateV4();
       const loginSuccess = this.packetWriter.write('LoginSuccessPacket', {
         username: this.username,
-        // Temporary
         UUID: this.UUID,
       });
       this.packetReader.state = State.PLAY;
@@ -171,8 +247,10 @@ export type MinecraftServerClientEvents = {
 export interface MinecraftServerClientOptions {
   /** Compression treshold to apply (if not specified or `-1` compression isn't enabled) */
   compressionTreshold?: number;
-  /** Public key of the server */
-  serverPublicKey?: Buffer;
+  /** Whether or not online mode is enabled on the server */
+  onlineMode?: boolean;
+  /** Server's RSA key */
+  serverKey?: NodeRSA;
   /**
    * This function is called when the PingPacket is received.
    * If a function is provided it'll take its return value

@@ -1,15 +1,19 @@
 import { UUID } from '@minecraft-js/uuid';
+import { yggdrasil } from '@minecraft-js/yggdrasil';
+import { constants, publicEncrypt, randomBytes } from 'node:crypto';
 import * as EventEmitter from 'node:events';
 import { Socket } from 'node:net';
 import TypedEmitter from 'typed-emitter';
 import {
   ClientboundPacketReader,
+  ClientboundProtocol,
   PacketReader,
   packets,
   PacketWriter,
   ServerboundPacketWriter,
   State,
 } from '../protocol';
+import { parsePublicKey } from '../utils';
 
 export class MinecraftClient extends (EventEmitter as new () => TypedEmitter<MinecraftClientEvents>) {
   /** UUID of the client */
@@ -19,13 +23,17 @@ export class MinecraftClient extends (EventEmitter as new () => TypedEmitter<Min
 
   /** Socket bound to this client */
   private readonly socket: Socket;
-  /** PacketReader instance usedr to read the packets from the server */
+  /** PacketReader instance used to read the packets from the server */
   private readonly packetReader: ClientboundPacketReader;
   /** PacketWriter instance used to write the packets to the server */
   private readonly packetWriter: ServerboundPacketWriter;
   /** Options passed to this Client */
   private readonly options: MinecraftClientOptions;
 
+  /**
+   * Create a new Minecraft client
+   * @param options Options to pass to the client
+   */
   public constructor(options?: MinecraftClientOptions) {
     super();
 
@@ -36,8 +44,8 @@ export class MinecraftClient extends (EventEmitter as new () => TypedEmitter<Min
 
     this.socket = new Socket();
     this.packetReader = new PacketReader(packets.clientbound, {
-      // debugging: true,
-      // debugTag: 'Client',
+      debugging: false,
+      debugTag: 'Client',
     });
     this.packetWriter = new PacketWriter(packets.serverbound);
 
@@ -53,6 +61,24 @@ export class MinecraftClient extends (EventEmitter as new () => TypedEmitter<Min
         this.doLoginSequence();
       }
     );
+
+    this.packetReader.onPacket('KeepAlivePacket', (packet) => {
+      if (this.options.disableBuiltInKeepAlive === true) return;
+
+      const keepAlive = this.packetWriter.write('KeepAlivePacket', {
+        id: packet.data.id,
+      });
+
+      this.writeRaw(keepAlive);
+    });
+
+    this.packetReader.on('anyPacket', (name, packet) => {
+      this.emit('packet', name, packet);
+    });
+
+    this.packetReader.on('unknownPacket', (buffer) => {
+      this.emit('unknownPacket', buffer);
+    });
   }
 
   /**
@@ -63,6 +89,21 @@ export class MinecraftClient extends (EventEmitter as new () => TypedEmitter<Min
     this.socket.write(buffer);
   }
 
+  /**
+   * Execute the login sequence
+   * - C -> S: Handshake with Next State set to 2 (login)
+   * - C -> S: Login Start
+   *
+   * `---- Online mode begin ----`
+   * - S -> C: Encryption Request
+   * - *Client auth*
+   * - C -> S: Encryption Response
+   * - *Server auth, both enable encryption*
+   *
+   * `---- Online mode end ----`
+   * - S -> C: Login Success and Set Compression
+   * @see https://wiki.vg/index.php?title=Protocol&oldid=7368#Login
+   */
   private doLoginSequence(): void {
     const handshake = this.packetWriter.write('HandshakePacket', {
       protocolVersion: 47,
@@ -81,8 +122,43 @@ export class MinecraftClient extends (EventEmitter as new () => TypedEmitter<Min
     this.writeRaw(loginStart);
 
     // Encryption support
+    this.packetReader.onPacket('EncryptionRequestPacket', async (packet) => {
+      const sharedToken = randomBytes(16);
+      const serverPublicKey = parsePublicKey(packet.data.publicKey);
+
+      const key = {
+        key: serverPublicKey,
+        padding: constants.RSA_PKCS1_PADDING,
+      };
+
+      const encryptedVerifyToken = publicEncrypt(key, packet.data.verifyToken);
+      const encryptedSharedToken = publicEncrypt(key, sharedToken);
+
+      await yggdrasil.join(
+        this.options.accessToken,
+        this.options.UUID,
+        packet.data.serverId,
+        sharedToken,
+        packet.data.publicKey
+      );
+
+      const encryptionResponse = this.packetWriter.write(
+        'EncryptionResponsePacket',
+        {
+          verifyToken: encryptedVerifyToken,
+          sharedSecret: encryptedSharedToken,
+        }
+      );
+
+      this.writeRaw(encryptionResponse);
+
+      this.packetReader.setEncryption(true, sharedToken);
+      this.packetWriter.setEncryption(true, sharedToken);
+    });
 
     this.packetReader.onPacket('SetCompressionPacket', (packet) => {
+      console.log('Compression treshold set to', packet.data.threshold);
+
       this.packetWriter.setCompression(true, packet.data.threshold);
     });
 
@@ -100,8 +176,14 @@ export class MinecraftClient extends (EventEmitter as new () => TypedEmitter<Min
 export type MinecraftClientEvents = {
   connected: () => void;
   raw_data: (data: Buffer) => void;
+  packet: <T extends keyof ClientboundProtocol>(
+    name: T,
+    packet: InstanceType<ClientboundProtocol[T]>
+  ) => void;
+  unknownPacket: (buffer: Buffer) => void;
 };
 
+/** Options you can pass to a `MinecraftClient` */
 export interface MinecraftClientOptions {
   /** Username for this client */
   username: string;
@@ -109,4 +191,10 @@ export interface MinecraftClientOptions {
   serverAddress: string;
   /** Port of the server, defaults to `25565` */
   serverPort?: number;
+  /** Whether or not to disable the built-in keepalive */
+  disableBuiltInKeepAlive?: boolean;
+  /** Access token of the account */
+  accessToken?: string;
+  /** UUID of the account */
+  UUID?: UUID;
 }
