@@ -21,12 +21,13 @@ export class MinecraftClient extends (EventEmitter as new () => TypedEmitter<Min
   /** Username of the client */
   public username: string;
 
+  /** PacketReader instance used to read the packets from the server */
+  public readonly packetReader: ClientboundPacketReader;
+  /** PacketWriter instance used to write the packets to the server */
+  public readonly packetWriter: ServerboundPacketWriter;
+
   /** Socket bound to this client */
   private readonly socket: Socket;
-  /** PacketReader instance used to read the packets from the server */
-  private readonly packetReader: ClientboundPacketReader;
-  /** PacketWriter instance used to write the packets to the server */
-  private readonly packetWriter: ServerboundPacketWriter;
   /** Options passed to this Client */
   private readonly options: MinecraftClientOptions;
 

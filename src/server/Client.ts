@@ -27,16 +27,16 @@ export class MinecraftServerClient extends (EventEmitter as new () => TypedEmitt
   public username: string;
   /** Whether or not this client is playing */
   public playing: boolean;
-
   /** Shared secret used for encryption, only defined if online mode is enabled */
   private sharedSecret: Buffer;
 
+  /** PacketReader instance usedr to read the packets from the client */
+  public readonly packetReader: ServerboundPacketReader;
+  /** PacketWriter instance used to write the packets to the client */
+  public readonly packetWriter: ClientboundPacketWriter;
+
   /** Socket bound to this client */
   private readonly socket: Socket;
-  /** PacketReader instance usedr to read the packets from the client */
-  private readonly packetReader: ServerboundPacketReader;
-  /** PacketWriter instance used to write the packets to the client */
-  private readonly packetWriter: ClientboundPacketWriter;
   /** Options passed to this ServerClient */
   private readonly options: MinecraftServerClientOptions;
 
