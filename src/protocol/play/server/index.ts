@@ -4,3 +4,4 @@ export * from './Player';
 export * from './PlayerLook';
 export * from './PlayerPosition';
 export * from './PlayerPositionAndLook';
+export * from './PluginMessage';
