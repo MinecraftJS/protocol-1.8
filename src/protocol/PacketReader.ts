@@ -3,6 +3,7 @@ import { createDecipheriv, Decipher, KeyObject } from 'node:crypto';
 import { inflateSync } from 'node:zlib';
 import { ProtocolResolvable } from '..';
 import { State } from './constants';
+import * as datatypes from './datatypes';
 import { HandshakePacket } from './handshaking/server';
 import { LoginSuccessPacket, SetCompressionPacket } from './login/client';
 import { Packet } from './Packet';
@@ -161,7 +162,9 @@ export class PacketReader<Protocol extends ProtocolResolvable> {
     if (Packet && event) {
       this.debug(event);
 
-      const packet = new Packet(new BufWrapper(data));
+      const packet = new Packet(
+        new BufWrapper(data, { plugins: { mc: datatypes } })
+      );
       packet.read();
 
       if (this.options.disablePacketEffectProcessing !== true)

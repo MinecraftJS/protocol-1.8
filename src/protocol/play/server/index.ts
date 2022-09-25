@@ -1,3 +1,4 @@
+export * from './ChatMessage';
 export * from './EntityAction';
 export * from './KeepAlive';
 export * from './Player';

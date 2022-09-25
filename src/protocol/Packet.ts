@@ -1,4 +1,4 @@
-import { BufWrapper } from '@minecraft-js/bufwrapper';
+import { MinecraftBufWrapper } from '.';
 import { State } from './constants';
 
 /** Class representing a packet */
@@ -9,7 +9,7 @@ export class Packet<T> {
   public static state: State;
 
   /** BufWrapper instance that wraps the buffer for this packet */
-  public buf: BufWrapper;
+  public buf: MinecraftBufWrapper;
   /** Data associated to this packet */
   public data: T;
 
@@ -17,7 +17,7 @@ export class Packet<T> {
    * Read or write a packet
    * @param buf Buffer to create the packet from, can be `undefined` if you are building a packet
    */
-  public constructor(buf?: BufWrapper) {
+  public constructor(buf?: MinecraftBufWrapper) {
     this.buf = buf;
   }
 

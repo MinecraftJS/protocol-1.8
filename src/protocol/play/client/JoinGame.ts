@@ -15,13 +15,10 @@ export class JoinGamePacket extends Packet<JoinGame> {
     this.data = data || this.data;
 
     this.buf.writeInt(this.data.entityId);
-    this.buf.writeBytes([this.data.gamemode]);
-
-    const dimensionBuf = Buffer.alloc(1);
-    dimensionBuf.writeInt8(this.data.dimension);
-    this.buf.writeBytes(dimensionBuf);
-
-    this.buf.writeBytes([this.data.difficulty, this.data.maxPlayers]);
+    this.buf.plugins.mc.writeUByte(this.data.gamemode);
+    this.buf.plugins.mc.writeByte(this.data.dimension);
+    this.buf.plugins.mc.writeUByte(this.data.difficulty);
+    this.buf.plugins.mc.writeUByte(this.data.maxPlayers);
     this.buf.writeString(this.data.levelType);
     this.buf.writeBoolean(this.data.reducedDebugInfo);
 
@@ -30,11 +27,11 @@ export class JoinGamePacket extends Packet<JoinGame> {
 
   public read(): JoinGame {
     this.data = {
-      entityId: this.buf.readVarInt(),
-      gamemode: this.buf.readBytes(1)[0] as JoinGame['gamemode'],
-      dimension: this.buf.readBytes(1).readInt8() as JoinGame['dimension'],
-      difficulty: this.buf.readBytes(1)[0] as JoinGame['difficulty'],
-      maxPlayers: this.buf.readBytes(1)[0],
+      entityId: this.buf.readInt(),
+      gamemode: this.buf.plugins.mc.readUByte(),
+      dimension: this.buf.plugins.mc.readByte(),
+      difficulty: this.buf.plugins.mc.readUByte(),
+      maxPlayers: this.buf.plugins.mc.readUByte(),
       levelType: this.buf.readString() as JoinGame['levelType'],
       reducedDebugInfo: this.buf.readBoolean(),
     };

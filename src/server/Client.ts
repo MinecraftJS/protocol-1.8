@@ -1,3 +1,7 @@
+import {
+  ComponentResolvable,
+  StringComponentBuilder,
+} from '@minecraft-js/chat';
 import { generateV4, UUID } from '@minecraft-js/uuid';
 import { HasJoinedResponse, yggdrasil } from '@minecraft-js/yggdrasil';
 import * as NodeRSA from 'node-rsa';
@@ -79,6 +83,25 @@ export class MinecraftServerClient extends (EventEmitter as new () => TypedEmitt
    */
   public writeRaw(buffer: Buffer): void {
     this.socket.write(buffer);
+  }
+
+  /**
+   * Disconnect the client from the server
+   * @param reason Reason to display to the client, defaults to `Disconnected`
+   */
+  public disconnect(
+    reason: string | ComponentResolvable = 'Disconnected'
+  ): void {
+    if (typeof reason === 'string')
+      reason = new StringComponentBuilder().setText(reason).component;
+
+    const disconnect = this.packetWriter.write('Disconnect2Packet', {
+      reason,
+    });
+
+    this.writeRaw(disconnect);
+    this.socket.destroy();
+    this.emit('disconnected');
   }
 
   /**

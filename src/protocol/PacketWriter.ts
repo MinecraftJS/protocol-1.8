@@ -2,6 +2,7 @@ import { BufWrapper } from '@minecraft-js/bufwrapper';
 import { Cipher, createCipheriv } from 'node:crypto';
 import { deflateSync } from 'node:zlib';
 import { ProtocolResolvable } from '..';
+import * as datatypes from './datatypes';
 import { Packet } from './Packet';
 
 export class PacketWriter<Protocol extends ProtocolResolvable> {
@@ -62,7 +63,10 @@ export class PacketWriter<Protocol extends ProtocolResolvable> {
         `Can't write unknown packet (packet=${packetName.toString()})`
       );
 
-    const packetBuf = new BufWrapper(null, { oneConcat: true });
+    const packetBuf = new BufWrapper(null, {
+      oneConcat: true,
+      plugins: { mc: datatypes },
+    });
     packetBuf.writeVarInt(Packet.id);
 
     const packet = new Packet(packetBuf);

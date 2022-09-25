@@ -1,3 +1,4 @@
+import { ComponentResolvable } from '@minecraft-js/chat';
 import { State } from '../../constants';
 import { Packet } from '../../Packet';
 
@@ -8,15 +9,14 @@ export class DisconnectPacket extends Packet<Disconnect> {
   public write(data?: Disconnect): void {
     this.data = data || this.data;
 
-    // TODO: Parse `Chat` field type
-    this.buf.writeBytes(Buffer.alloc(1));
+    this.buf.plugins.mc.writeChat(this.data.reason);
 
     this.buf.finish();
   }
 
   public read(): Disconnect {
     this.data = {
-      reason: this.buf.readBytes(1),
+      reason: this.buf.plugins.mc.readChat(),
     };
 
     return this.data;
@@ -27,5 +27,5 @@ export class DisconnectPacket extends Packet<Disconnect> {
  * @see https://wiki.vg/index.php?title=Protocol&oldid=7368#Disconnect_2
  */
 interface Disconnect {
-  reason: Buffer;
+  reason: ComponentResolvable;
 }

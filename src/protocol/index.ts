@@ -29,8 +29,12 @@ export * from './Packet';
 export * from './PacketReader';
 export * from './PacketWriter';
 
+import { BufWrapper } from '@minecraft-js/bufwrapper';
+import * as datatypes from './datatypes';
 import { PacketReader } from './PacketReader';
 import { PacketWriter } from './PacketWriter';
+
+export type MinecraftBufWrapper = BufWrapper<{ mc: typeof datatypes }>;
 
 export type ClientboundProtocol = typeof packets['clientbound'];
 export type ServerboundProtocol = typeof packets['serverbound'];

@@ -23,6 +23,7 @@
   "homepage": "https://github.com/MinecraftJS/protocol-1.8#readme",
   "dependencies": {
     "@minecraft-js/bufwrapper": "^1.4.6",
+    "@minecraft-js/chat": "^1.0.0",
     "@minecraft-js/uuid": "^1.0.3",
     "@minecraft-js/yggdrasil": "^1.0.0",
     "node-rsa": "^1.1.1"
