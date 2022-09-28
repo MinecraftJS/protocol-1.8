@@ -160,3 +160,19 @@ export enum EntityStatus {
   /** Disables reduced debug for players */
   DISABLE_REDUCED_DEBUG = 23,
 }
+
+/**
+ * Enumeration of the diffent operations
+ * that are applicable on a modifier
+ *
+ * Used in the following packets:
+ * - EntityPropertiesPacket
+ */
+export enum ModifierOperation {
+  /** Add/subtract amount */
+  ADD_SUBSTRACT = 0,
+  /** Add/subtract amount percent of the current value */
+  ADD_SUBSTRACT_PERCENT = 1,
+  /** Multiply by amount percent */
+  MULTIPLY_PERCENT = 3,
+}
