@@ -176,3 +176,27 @@ export enum ModifierOperation {
   /** Multiply by amount percent */
   MULTIPLY_PERCENT = 3,
 }
+
+/**
+ * Represent a position field
+ * @see https://wiki.vg/index.php?title=Protocol&oldid=7368#Position
+ */
+export interface Position {
+  x: number;
+  y: number;
+  z: number;
+}
+
+/**
+ * Enumeration of the different
+ * available direction for a painting
+ *
+ * Used in the following packets:
+ * - SpawnPainting
+ */
+export enum PaintingDirection {
+  NORTH = 0,
+  WEST = 1,
+  SOUTH = 2,
+  EAST = 3,
+}
