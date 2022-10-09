@@ -18,8 +18,8 @@ export function writeAngle(
   value: number,
   type: AngleType = 'degrees'
 ): void {
-  if (type === 'degrees') value = (255 * 360) / value;
-  if (type === 'radians') value = (255 * 2 * Math.PI) / value;
+  if (type === 'degrees') value = (255 * value) / 360;
+  if (type === 'radians') value = (255 * value) / (2 * Math.PI);
   this.writeBytes([value]);
 }
 
