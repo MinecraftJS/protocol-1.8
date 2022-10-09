@@ -20,6 +20,21 @@ server.on('connection', (client) => {
     disableBuiltInKeepAlive: true,
   });
 
+  /** The following code is used to dump bulk chunk packets */
+  // const { writeFile } = require('fs/promises');
+  // const { generateV4 } = require('@minecraft-js/uuid');
+  // const chunkMetas = [];
+  // fakeClient.packetReader.onPacket('MapChunkBulkPacket', (packet) => {
+  //   const id = generateV4();
+  //   writeFile('chunks/' + id + '.bin', packet.data.chunkData);
+  //   chunkMetas.push({
+  //     id,
+  //     skyLightSent: packet.data.skyLightSent,
+  //     chunkMeta: packet.data.chunkMeta,
+  //   });
+  //   writeFile('chunks/metas.json', JSON.stringify(chunkMetas, null, 2));
+  // });
+
   // As soon as the fake client is
   // connected redirect all the
   // packets using the `raw_data`

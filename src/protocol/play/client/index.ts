@@ -17,6 +17,7 @@ export * from './EntityTeleport';
 export * from './EntityVelocity';
 export * from './JoinGame';
 export * from './KeepAlive';
+export * from './MapChunkBulk';
 export * from './PlayerPositionAndLook';
 export * from './PluginMessage';
 export * from './RemoveEntityEffect';
