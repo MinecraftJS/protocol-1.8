@@ -9,9 +9,9 @@ export class EntityTeleportPacket extends Packet<EntityTeleport> {
     this.data = data || this.data;
 
     this.buf.writeVarInt(this.data.entityId);
-    this.buf.plugins.mc.writeByte(this.data.x);
-    this.buf.plugins.mc.writeByte(this.data.y);
-    this.buf.plugins.mc.writeByte(this.data.z);
+    this.buf.plugins.mc.writeFixedPointNumber(this.data.x);
+    this.buf.plugins.mc.writeFixedPointNumber(this.data.y);
+    this.buf.plugins.mc.writeFixedPointNumber(this.data.z);
     this.buf.plugins.mc.writeAngle(this.data.yaw, 'degrees');
     this.buf.plugins.mc.writeAngle(this.data.pitch, 'degrees');
     this.buf.writeBoolean(this.data.onGround);
@@ -22,9 +22,9 @@ export class EntityTeleportPacket extends Packet<EntityTeleport> {
   public read(): EntityTeleport {
     this.data = {
       entityId: this.buf.readVarInt(),
-      x: this.buf.plugins.mc.readByte(),
-      y: this.buf.plugins.mc.readByte(),
-      z: this.buf.plugins.mc.readByte(),
+      x: this.buf.plugins.mc.readFixedPointNumber(),
+      y: this.buf.plugins.mc.readFixedPointNumber(),
+      z: this.buf.plugins.mc.readFixedPointNumber(),
       yaw: this.buf.plugins.mc.readAngle('degrees'),
       pitch: this.buf.plugins.mc.readAngle('degrees'),
       onGround: this.buf.readBoolean(),

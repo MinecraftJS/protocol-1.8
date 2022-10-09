@@ -9,9 +9,9 @@ export class EntityRelativeMovePacket extends Packet<EntityRelativeMove> {
     this.data = data || this.data;
 
     this.buf.writeVarInt(this.data.entityId);
-    this.buf.plugins.mc.writeByte(this.data.deltaX);
-    this.buf.plugins.mc.writeByte(this.data.deltaY);
-    this.buf.plugins.mc.writeByte(this.data.deltaZ);
+    this.buf.plugins.mc.writeByte(this.data.deltaX * 32);
+    this.buf.plugins.mc.writeByte(this.data.deltaY * 32);
+    this.buf.plugins.mc.writeByte(this.data.deltaZ * 32);
     this.buf.writeBoolean(this.data.onGround);
 
     this.buf.finish();
@@ -20,9 +20,9 @@ export class EntityRelativeMovePacket extends Packet<EntityRelativeMove> {
   public read(): EntityRelativeMove {
     this.data = {
       entityId: this.buf.readVarInt(),
-      deltaX: this.buf.plugins.mc.readByte(),
-      deltaY: this.buf.plugins.mc.readByte(),
-      deltaZ: this.buf.plugins.mc.readByte(),
+      deltaX: this.buf.plugins.mc.readByte() / 32,
+      deltaY: this.buf.plugins.mc.readByte() / 32,
+      deltaZ: this.buf.plugins.mc.readByte() / 32,
       onGround: this.buf.readBoolean(),
     };
 

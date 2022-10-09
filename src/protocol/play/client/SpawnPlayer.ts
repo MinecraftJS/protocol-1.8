@@ -11,9 +11,9 @@ export class SpawnPlayerPacket extends Packet<SpawnPlayer> {
 
     this.buf.writeVarInt(this.data.entityId);
     this.buf.writeUUID(this.data.playerUUID);
-    this.buf.writeInt(this.data.x); // TODO: Fixed-Point number
-    this.buf.writeInt(this.data.y); // TODO: Fixed-Point number
-    this.buf.writeInt(this.data.z); // TODO: Fixed-Point number
+    this.buf.plugins.mc.writeFixedPointNumber(this.data.x);
+    this.buf.plugins.mc.writeFixedPointNumber(this.data.y);
+    this.buf.plugins.mc.writeFixedPointNumber(this.data.z);
     this.buf.plugins.mc.writeAngle(this.data.yaw, 'degrees');
     this.buf.plugins.mc.writeAngle(this.data.pitch, 'degrees');
     this.buf.writeShort(this.data.currentItem);
@@ -26,9 +26,9 @@ export class SpawnPlayerPacket extends Packet<SpawnPlayer> {
     this.data = {
       entityId: this.buf.readVarInt(),
       playerUUID: this.buf.readUUID(),
-      x: this.buf.readInt(), // TODO: Fixed-Point number
-      y: this.buf.readInt(), // TODO: Fixed-Point number
-      z: this.buf.readInt(), // TODO: Fixed-Point number
+      x: this.buf.plugins.mc.readFixedPointNumber(),
+      y: this.buf.plugins.mc.readFixedPointNumber(),
+      z: this.buf.plugins.mc.readFixedPointNumber(),
       yaw: this.buf.plugins.mc.readAngle('degrees'),
       pitch: this.buf.plugins.mc.readAngle('degrees'),
       currentItem: this.buf.readShort(),

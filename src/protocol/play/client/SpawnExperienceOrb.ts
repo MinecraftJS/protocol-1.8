@@ -9,9 +9,9 @@ export class SpawnExperienceOrbPacket extends Packet<SpawnExperienceOrb> {
     this.data = data || this.data;
 
     this.buf.writeVarInt(this.data.entityId);
-    this.buf.writeInt(this.data.x);
-    this.buf.writeInt(this.data.y);
-    this.buf.writeInt(this.data.z);
+    this.buf.plugins.mc.writeFixedPointNumber(this.data.x);
+    this.buf.plugins.mc.writeFixedPointNumber(this.data.y);
+    this.buf.plugins.mc.writeFixedPointNumber(this.data.z);
     this.buf.writeShort(this.data.count);
 
     this.buf.finish();
@@ -20,9 +20,9 @@ export class SpawnExperienceOrbPacket extends Packet<SpawnExperienceOrb> {
   public read(): SpawnExperienceOrb {
     this.data = {
       entityId: this.buf.readVarInt(),
-      x: this.buf.readInt(),
-      y: this.buf.readInt(),
-      z: this.buf.readInt(),
+      x: this.buf.plugins.mc.readFixedPointNumber(),
+      y: this.buf.plugins.mc.readFixedPointNumber(),
+      z: this.buf.plugins.mc.readFixedPointNumber(),
       count: this.buf.readShort(),
     };
 
