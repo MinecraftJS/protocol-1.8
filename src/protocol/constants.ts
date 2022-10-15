@@ -1,3 +1,5 @@
+import { parseNBT } from '@minecraft-js/nbt';
+
 /**
  * Enumeration of all the states the client could be in
  */
@@ -199,4 +201,72 @@ export enum PaintingDirection {
   WEST = 1,
   SOUTH = 2,
   EAST = 3,
+}
+
+/**
+ * Enumeration of all the types for
+ * the UseEntity packet
+ *
+ * Used in the following packets:
+ * - UseEntityPacket
+ */
+export enum UseEntityType {
+  INTERACT = 0,
+  ATTACK = 1,
+  INTERACT_AT = 2,
+}
+
+/**
+ * Enumeration of the different
+ * available status for the
+ * PlayerDigging packet
+ *
+ * Used in the following packets:
+ * - PlayerDiggingPacket
+ */
+export enum PlayerDiggingStatus {
+  STARTED_DIGGING = 0,
+  CANCELLED_DIGGING = 1,
+  FINISHED_DIGGING = 2,
+  DROP_ITEM_STACK = 3,
+  DROP_ITEM = 4,
+  SHOOT_ARROW = 5,
+  FINISH_EATING = 5,
+}
+
+/**
+ * Enumeration of the different
+ * block faces
+ *
+ * Used in the following packets:
+ * - PlayerDiggingPacket
+ * - PlayerBlockPlacementPacket
+ */
+export enum BlockFace {
+  MINUS_Y = 0,
+  PLUS_Y = 1,
+  MINUS_Z = 2,
+  PLUS_Z = 3,
+  MINUS_X = 4,
+  PLUS_X = 5,
+}
+
+export interface Slot {
+  blockId: number;
+  itemCount?: number;
+  itemDamage?: number;
+  nbt?: ReturnType<typeof parseNBT>; // TODO: Better typing (adding exports to nbt lib)
+}
+
+/**
+ * Enumeration of the different
+ * available flags for the
+ * SteerVehicle packet
+ *
+ * Used in the following packets:
+ * - SteerVehiclePacket
+ */
+export enum SteerVehicleFlag {
+  JUMP = 0b01,
+  UNMOUNT = 0b10,
 }

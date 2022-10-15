@@ -4,5 +4,6 @@ export * from './chat';
 export * from './fixedPointNumber';
 export * from './identifier';
 export * from './position';
+export * from './slot';
 export * from './uByte';
 export * from './uShort';
