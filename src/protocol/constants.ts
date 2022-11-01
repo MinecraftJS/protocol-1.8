@@ -270,3 +270,68 @@ export enum SteerVehicleFlag {
   JUMP = 0b01,
   UNMOUNT = 0b10,
 }
+
+/**
+ * Enumeration of the different
+ * available modes for the
+ * ClickWindow packet
+ *
+ * Used in the following packets:
+ * - ClickWindowPacket
+ * @see https://wiki.vg/index.php?title=Protocol&oldid=7368#Click_Window
+ */
+export enum ClickWindowMode {
+  NORMAL = 0,
+  SHIFT_NORMAL = 1,
+  NUMBER_KEYS = 2,
+  MIDDLE_CLICK = 3,
+  SPECIALS = 4,
+  DRAG = 5,
+  DOUBLE_CLICK = 6,
+}
+
+/**
+ * Enumeration of the different
+ * available flags for the
+ * PlayerAbilities packet
+ *
+ * Used in the following packets:
+ * - PlayerAbilities (Serverbound)
+ */
+export enum PlayerAbilityFlag {
+  IS_CREATING = 0b0001,
+  IS_FLYING = 0b0010,
+  CAN_FLY = 0b0100,
+  DAMAGE_DISABLED = 0b1000,
+}
+
+/**
+ * Enumerastion of the different
+ * available values of the
+ * `chatMode` field of the ClientSettings
+ * packet.
+ *
+ * Used in the following packets:
+ * - ClientSettings
+ */
+export enum ChatMode {
+  ENABLED = 0,
+  COMMANDS_ONLY = 1,
+  HIDDEN = 2,
+}
+
+/**
+ * Enumeration of all the skin parts
+ *
+ * Used in the following packets:
+ * - ClientSettings
+ */
+export enum SkinPart {
+  CAPE = 0b0000001,
+  JACKET = 0b0000010,
+  LEFT_SLEEVE = 0b0000100,
+  RIGHT_SLEEVE = 0b0001000,
+  LEFT_PANTS = 0b0010000,
+  RIGHT_PANTS = 0b0100000,
+  HAT = 0b1000000,
+}
