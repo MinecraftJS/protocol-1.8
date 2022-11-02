@@ -194,7 +194,7 @@ export interface Position {
  * available direction for a painting
  *
  * Used in the following packets:
- * - SpawnPainting
+ * - SpawnPaintingPacket
  */
 export enum PaintingDirection {
   NORTH = 0,
@@ -296,7 +296,7 @@ export enum ClickWindowMode {
  * PlayerAbilities packet
  *
  * Used in the following packets:
- * - PlayerAbilities (Serverbound)
+ * - PlayerAbilitiesPacket (Serverbound)
  */
 export enum PlayerAbilityFlag {
   IS_CREATING = 0b0001,
@@ -312,7 +312,7 @@ export enum PlayerAbilityFlag {
  * packet.
  *
  * Used in the following packets:
- * - ClientSettings
+ * - ClientSettingsPacket
  */
 export enum ChatMode {
   ENABLED = 0,
@@ -324,7 +324,7 @@ export enum ChatMode {
  * Enumeration of all the skin parts
  *
  * Used in the following packets:
- * - ClientSettings
+ * - ClientSettingsPacket
  */
 export enum SkinPart {
   CAPE = 0b0000001,
@@ -334,4 +334,25 @@ export enum SkinPart {
   LEFT_PANTS = 0b0010000,
   RIGHT_PANTS = 0b0100000,
   HAT = 0b1000000,
+}
+
+/**
+ * Enumeration of the different
+ * available values for the action id
+ * field of the ClientStatus packet
+ *
+ * Used in the following packets:
+ * - ClientStatusPacket
+ */
+export enum ActionId {
+  PERFORM_RESPAWN = 0,
+  REQUEST_STATS = 1,
+  TAKING_INVENTORY_ACHIEVEMENT = 1,
+}
+
+export enum ResourcePackStatus {
+  SUCCESSFULY_LOADED = 0,
+  DECLINED = 1,
+  FAILED_DOWNLOAD = 2,
+  ACCEPTED = 3,
 }
