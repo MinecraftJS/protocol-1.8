@@ -31,6 +31,5 @@ export class KeepAlivePacket extends Packet<KeepAlive> {
  * @see https://wiki.vg/index.php?title=Protocol&oldid=7368#Keep_Alive
  */
 interface KeepAlive {
-  /** Username of the player */
   id: number;
 }

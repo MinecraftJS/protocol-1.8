@@ -350,6 +350,15 @@ export enum ActionId {
   TAKING_INVENTORY_ACHIEVEMENT = 1,
 }
 
+/**
+ * Enumeration of the different
+ * available values for the result
+ * field of the ResourcePackStatus
+ * packet
+ *
+ * Used in the following packets:
+ * - ResourcePackStatusPacket
+ */
 export enum ResourcePackStatus {
   SUCCESSFULY_LOADED = 0,
   DECLINED = 1,
