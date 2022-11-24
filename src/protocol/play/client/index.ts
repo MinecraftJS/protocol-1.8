@@ -36,3 +36,4 @@ export * from './SpawnPosition';
 export * from './TimeUpdate';
 export * from './UpdateHealth';
 export * from './UseBed';
+export * from './Effect';

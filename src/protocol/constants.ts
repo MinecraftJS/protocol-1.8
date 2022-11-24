@@ -365,3 +365,12 @@ export enum ResourcePackStatus {
   FAILED_DOWNLOAD = 2,
   ACCEPTED = 3,
 }
+
+export enum Effect {
+  RANDOM_CLICK = 1000,
+  RANDOM_CLICK_2 = 1001,
+  RANDOM_BOW = 1002,
+  RANDOM_DOOR_OPEN_CLOSE = 1003,
+  RANDOM_FIZZ = 1004,
+  MUSIC_DISC = 1005,
+}
