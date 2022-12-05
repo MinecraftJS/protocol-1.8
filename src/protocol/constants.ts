@@ -374,3 +374,90 @@ export enum Effect {
   RANDOM_FIZZ = 1004,
   MUSIC_DISC = 1005,
 }
+
+export enum Particle {
+  EXPLODE = 0,
+  LARGE_EXPLOSION = 1,
+  HUGE_EXPLOSION = 2,
+  FIREWORKS_SPARK = 3,
+  BUBBLE = 4,
+  SPLASH = 5,
+  WAKE = 6,
+  SUSPENDED = 7,
+  DEPTH_SUSPEND = 8,
+  CRIT = 9,
+  MAGIC_CRIT = 10,
+  SMOKE = 11,
+  LARGE_SMOKE = 12,
+  SPELL = 13,
+  INSTANT_SPELL = 14,
+  MOB_SPELL_AMBIENT = 16,
+  WITCH_MAGIC = 17,
+  DRIP_WATER = 18,
+  DRIP_LAVA = 19,
+  ANGRY_VILLAGER = 20,
+  HAPPY_VILLAGER = 21,
+  TOWN_AURA = 22,
+  NOTE = 23,
+  PORTAL = 24,
+  ENCHANTEMENT_TABLE = 25,
+  FLAME = 26,
+  LAVA = 27,
+  FOOTSTEP = 28,
+  CLOUD = 29,
+  RED_DUST = 30,
+  SNOW_BALL_POOF = 31,
+  SNOW_SHOVEL = 32,
+  SLIME = 33,
+  HEART = 34,
+  BARRIER = 35,
+  ICON_CRACK = 36,
+  BLOCK_CRACK = 37,
+  BLOCK_DUST = 38,
+  DROPLET = 39,
+  TAKE = 40,
+  MOBAPPEARANCE = 41,
+}
+
+export enum ChangeGameStateReason {
+  INVALID_BED = 0,
+  END_RAINING = 1,
+  BEGIN_RAINING = 2,
+  CHANGE_GAME_MODE = 3,
+  ENTER_CREDITS = 4,
+  DEMO_MESSAGE = 5,
+  ARROW_HITTING_PLAYER = 6,
+  FADE_VALUE = 7,
+  /** Time in ticks for the sky to fade */
+  FADE_TIME = 8,
+  PLAY_MOB_APPEARANCE = 10,
+}
+
+export enum ChangeGameStateGameMode {
+  SURVIVAL = 0,
+  CREATIVE = 1,
+  ADVENTURE = 2,
+  SPECTATOR = 3,
+}
+
+export enum ChangeGameStateDemoMessage {
+  WELCOME = 0,
+  MOVEMENT_CONTROLS = 101,
+  JUMP_CONTROLS = 102,
+  INVENTORY_CONTROL = 103,
+}
+
+export enum WindowType {
+  CHEST = 'minecraft:chest',
+  CRAFTING_TABLE = 'minecraft:crafting_table',
+  FURNACE = 'minecraft:furnace',
+  DISPENSER = 'minecraft:dispenser',
+  ENCHANTING_TABLE = 'minecraft:enchanting_table',
+  BREWING_STAND = 'minecraft:brewing_stand',
+  VILLAGER = 'minecraft:villager',
+  BEACON = 'minecraft:beacon',
+  ANVIL = 'minecraft:anvil',
+  HOPPER = 'minecraft:hopper',
+  DROPPER = 'minecraft:dropper',
+  HORSE = 'EntityHorse',
+}
