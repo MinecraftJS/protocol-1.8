@@ -33,15 +33,7 @@ async function list(boundTo) {
             };
           })
       )
-    ).sort((a, b) => {
-      if (a.id < b.id) {
-        return -1;
-      }
-      if (a.id > b.id) {
-        return 1;
-      }
-      return 0;
-    });
+    ).sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0));
 
     console.log(` - State: ${state}`);
     for (const packet of packets) {
