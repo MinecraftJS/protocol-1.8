@@ -30,7 +30,7 @@
     "node-rsa": "^1.1.1"
   },
   "devDependencies": {
-    "@types/node": "^18.7.13",
+    "@types/node": "^20.1.0",
     "@types/node-rsa": "^1.1.1",
     "benchmark": "^2.1.4",
     "prettier": "^2.7.1",
